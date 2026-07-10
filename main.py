@@ -1,3 +1,19 @@
+def leer_opcion():
+    opcion_valida = False
+    opcion = None
+    while not opcion_valida:
+        entrada = input("Ingrese opcion: ")
+        try:
+            opcion = int(entrada)
+            if 1 <= opcion <= 6:
+                opcion_valida = True
+            else:
+                print("Debe seleccionar una opción válida")
+        except ValueError:
+            print("Debe seleccionar una opción válida")
+    return opcion
+
+
 def main():
     productos = {
         'M001': ['Alimento Premium', 'comida', 'DogPlus', 10, True, False],
@@ -28,9 +44,9 @@ def main():
         print("6. Salir")
         print("=====================================")
 
-        opcion = input("Ingrese opcion: ")
+        opcion = leer_opcion()
 
-        if opcion == "6":
+        if opcion == 6:
             print("Programa finalizado.")
             continuar = False
 
