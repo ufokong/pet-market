@@ -39,6 +39,84 @@ def busqueda_precio(p_min, p_max, productos, stock):
         print(f"Los productos encontrados son: {encontrados}")
 
 
+def buscar_codigo(codigo, stock):
+    codigo_buscado = codigo.upper()
+    for clave in stock:
+        if clave.upper() == codigo_buscado:
+            return True
+    return False
+
+
+def actualizar_precio(codigo, nuevo_precio, stock):
+    if buscar_codigo(codigo, stock):
+        for clave in stock:
+            if clave.upper() == codigo.upper():
+                stock[clave][0] = nuevo_precio
+                return True
+    return False
+
+
+def validar_texto(valor):
+    return valor.strip() != ""
+
+
+def validar_codigo_nuevo(codigo, stock):
+    if not validar_texto(codigo):
+        return False
+    return not buscar_codigo(codigo, stock)
+
+
+def validar_peso(valor):
+    try:
+        peso = float(valor)
+        return peso > 0
+    except ValueError:
+        return False
+
+
+def validar_si_no(valor):
+    return valor.lower() in ("s", "n")
+
+
+def validar_precio(valor):
+    try:
+        precio = int(valor)
+        return precio > 0
+    except ValueError:
+        return False
+
+
+def validar_unidades(valor):
+    try:
+        unidades = int(valor)
+        return unidades >= 0
+    except ValueError:
+        return False
+
+
+def agregar_producto(codigo, nombre, categoria, marca, peso_kg,
+                      es_importado, es_para_cachorro, precio, unidades,
+                      productos, stock):
+    if buscar_codigo(codigo, stock):
+        return False
+    productos[codigo] = [nombre, categoria, marca, peso_kg,
+                          es_importado, es_para_cachorro]
+    stock[codigo] = [precio, unidades]
+    return True
+
+
+def eliminar_producto(codigo, productos, stock):
+    if buscar_codigo(codigo, stock):
+        clave_real = None
+        for clave in stock:
+            if clave.upper() == codigo.upper():
+                clave_real = clave
+        del stock[clave_real]
+        del productos[clave_real]
+        return True
+    return False
+
+
 def main():
     productos = {
         'M001': ['Alimento Premium', 'comida', 'DogPlus', 10, True, False],
@@ -72,9 +150,9 @@ def main():
         opcion = leer_opcion()
 
         if opcion == 1:
-    	    categoria = input("Ingrese categoría a consultar: ")
-    	    unidades_categoria(categoria, productos, stock)        
-        
+            categoria = input("Ingrese categoría a consultar: ")
+            unidades_categoria(categoria, productos, stock)
+
         elif opcion == 2:
             datos_validos = False
             p_min = 0
@@ -91,7 +169,67 @@ def main():
                     print("Debe ingresar valores enteros")
             busqueda_precio(p_min, p_max, productos, stock)
 
-        if opcion == 6:
+        elif opcion == 3:
+            seguir = "s"
+            while seguir == "s":
+                codigo = input("Ingrese código del producto: ")
+                try:
+                    nuevo_precio = int(input("Ingrese nuevo precio: "))
+                except ValueError:
+                    print("El código no existe")
+                    seguir = input("¿Desea actualizar otro precio (s/n)?: ").lower()
+                    continue
+
+                if actualizar_precio(codigo, nuevo_precio, stock):
+                    print("Precio actualizado")
+                else:
+                    print("El código no existe")
+                seguir = input("¿Desea actualizar otro precio (s/n)?: ").lower()
+
+        elif opcion == 4:
+            codigo = input("Ingrese código del producto: ")
+            nombre = input("Ingrese nombre: ")
+            categoria = input("Ingrese categoría: ")
+            marca = input("Ingrese marca: ")
+            peso = input("Ingrese peso (kg): ")
+            importado = input("¿Es importado? (s/n): ")
+            cachorro = input("¿Es para cachorro? (s/n): ")
+            precio = input("Ingrese precio: ")
+            unidades = input("Ingrese unidades: ")
+
+            if not validar_codigo_nuevo(codigo, stock):
+                print("El código ya existe")
+            elif not validar_texto(nombre):
+                print("El nombre no es válido")
+            elif not validar_texto(categoria):
+                print("La categoría no es válida")
+            elif not validar_texto(marca):
+                print("La marca no es válida")
+            elif not validar_peso(peso):
+                print("El peso no es válido")
+            elif not validar_si_no(importado):
+                print("El valor de importado no es válido")
+            elif not validar_si_no(cachorro):
+                print("El valor de para cachorro no es válido")
+            elif not validar_precio(precio):
+                print("El precio no es válido")
+            elif not validar_unidades(unidades):
+                print("Las unidades no son válidas")
+            else:
+                agregado = agregar_producto(
+                    codigo, nombre, categoria, marca, float(peso),
+                    importado.lower() == "s", cachorro.lower() == "s",
+                    int(precio), int(unidades), productos, stock)
+                print("Producto agregado" if agregado else "El código ya existe")
+
+        elif opcion == 5:
+            codigo = input("Ingrese código del producto: ")
+            if eliminar_producto(codigo, productos, stock):
+                print("Producto eliminado")
+            else:
+                print("El código no existe")
+
+        elif opcion == 6:
             print("Programa finalizado.")
             continuar = False
 
