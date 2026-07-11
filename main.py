@@ -14,6 +14,31 @@ def leer_opcion():
     return opcion
 
 
+def unidades_categoria(categoria, productos, stock):
+    total = 0
+    categoria_buscada = categoria.lower()
+    for codigo, datos in productos.items():
+        if datos[1].lower() == categoria_buscada:
+            total += stock[codigo][1]
+    print(f"El total de unidades disponibles es: {total}")
+
+
+def busqueda_precio(p_min, p_max, productos, stock):
+    encontrados = []
+    for codigo, datos in stock.items():
+        precio = datos[0]
+        unidades = datos[1]
+        if p_min <= precio <= p_max and unidades != 0:
+            nombre = productos[codigo][0]
+            encontrados.append(f"{nombre}--{codigo}")
+
+    if len(encontrados) == 0:
+        print("No hay productos en ese rango de precios.")
+    else:
+        encontrados.sort()
+        print(f"Los productos encontrados son: {encontrados}")
+
+
 def main():
     productos = {
         'M001': ['Alimento Premium', 'comida', 'DogPlus', 10, True, False],
@@ -45,6 +70,26 @@ def main():
         print("=====================================")
 
         opcion = leer_opcion()
+
+        if opcion == 1:
+    	    categoria = input("Ingrese categoría a consultar: ")
+    	    unidades_categoria(categoria, productos, stock)        
+        
+        elif opcion == 2:
+            datos_validos = False
+            p_min = 0
+            p_max = 0
+            while not datos_validos:
+                try:
+                    p_min = int(input("Ingrese precio mínimo: "))
+                    p_max = int(input("Ingrese precio máximo: "))
+                    if p_min < 0 or p_max < 0 or p_min > p_max:
+                        print("Debe ingresar valores enteros")
+                    else:
+                        datos_validos = True
+                except ValueError:
+                    print("Debe ingresar valores enteros")
+            busqueda_precio(p_min, p_max, productos, stock)
 
         if opcion == 6:
             print("Programa finalizado.")
